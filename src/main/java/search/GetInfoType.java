@@ -10,7 +10,7 @@ public class GetInfoType {
         String finalTemp = "";
         String temp = data.substring(index + 7, index + 14);
         for (int i = 0; i < temp.length(); i++) {
-            if(i == 3) {
+            if (i == 3) {
                 finalTemp += ".";
             }
             if (Character.isDigit(temp.charAt(i))) {
@@ -20,9 +20,9 @@ public class GetInfoType {
         return finalTemp;
     }
 
-    public static List<String> temperatures(String data) {
+    public static List<String> minTemperatures(String data) {
         List<String> temperatures = new ArrayList<>();
-        String match = "\"temp\":";
+        String match = "\"temp_min\":";
         String finalTemp = "";
 
         int index = data.indexOf(match);
@@ -31,7 +31,34 @@ public class GetInfoType {
             String temp = data.substring(index + 7, index + 14);
 
             for (int i = 0; i < temp.length(); i++) {
-                if(i == 3) {
+                if (i == 3) {
+                    finalTemp += ".";
+                }
+                if (Character.isDigit(temp.charAt(i))) {
+                    finalTemp += temp.charAt(i);
+                }
+            }
+            temperatures.add(finalTemp);
+            finalTemp = "";
+            if (temperatures.size() == 24) {
+                return temperatures;
+            }
+        }
+        return temperatures;
+    }
+
+    public static List<String> maxTemperatures(String data) {
+        List<String> temperatures = new ArrayList<>();
+        String match = "\"temp_max\":";
+        String finalTemp = "";
+
+        int index = data.indexOf(match);
+        while (index >= 0) {
+            index = data.indexOf(match, index + 1);
+            String temp = data.substring(index + 7, index + 14);
+
+            for (int i = 0; i < temp.length(); i++) {
+                if (i == 3) {
                     finalTemp += ".";
                 }
                 if (Character.isDigit(temp.charAt(i))) {

@@ -1,8 +1,6 @@
 package search;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 
 
@@ -16,6 +14,7 @@ public class ReadResponse {
         while ((inputLine = in.readLine()) != null) {
             content.append(inputLine);
         }
+
         in.close();
         con.disconnect();
         return String.valueOf(content);
