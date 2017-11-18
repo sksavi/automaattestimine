@@ -10,8 +10,8 @@ public class Validator {
         return data.startsWith("{") && data.endsWith("}");
     }
 
-    public boolean validateCoordinates(String data) {
-        return data.contains("{\"lon\":24.75,\"lat\":59.44}") || data.contains("{\"lat\":59.437,\"lon\":24.7535}");
+    public boolean validateCoordinatesExist(String report) {
+        return report.contains("{\"lon\":") && report.contains("\"lat\":");
     }
 
     public boolean validateTemperatureFormat(String temperature) {

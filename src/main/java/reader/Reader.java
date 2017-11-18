@@ -8,32 +8,45 @@ import java.util.List;
 
 public class Reader {
 
+
+    private static final int LENGHTH_OF_FIXED_STRING = 8;
+
     public Reader() {}
 
-    public String readFrom(HttpURLConnection con) throws IOException {
+    public String readFrom(HttpURLConnection connection) throws IOException {
         BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
+                new InputStreamReader(connection.getInputStream()));
         String inputLine;
-        StringBuilder content = new StringBuilder();
+        StringBuilder report = new StringBuilder();
         while ((inputLine = in.readLine()) != null) {
-            content.append(inputLine);
+            report.append(inputLine);
         }
-
         in.close();
-        con.disconnect();
-        return String.valueOf(content);
+        connection.disconnect();
+        return String.valueOf(report);
     }
 
     public String readInputTxtFile() throws IOException {
         File file = new File("C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\input.txt");
         BufferedReader br = new BufferedReader(new FileReader(file));
         String inputLine;
-        StringBuilder content = new StringBuilder();
+        StringBuilder report = new StringBuilder();
         while ((inputLine = br.readLine()) != null) {
-            content.append(inputLine);
+            report.append(inputLine);
         }
         br.close();
-        return String.valueOf(content);
+        return String.valueOf(report);
+    }
+
+    public String readNameFrom(String report, String requestType) {
+        int index = report.indexOf("\"name\":\"");
+        if (requestType.equals("CurrentWeather")) {
+            int lastIndex = report.indexOf("\",\"cod\"");
+            return report.substring(index + LENGHTH_OF_FIXED_STRING, lastIndex);
+        } else {
+            int lastIndex = report.indexOf("\",\"coord\"");
+            return report.substring(index + LENGHTH_OF_FIXED_STRING, lastIndex);
+        }
     }
 
     public String readCurrentTemperatureFrom(String report) {
@@ -104,4 +117,6 @@ public class Reader {
         }
         return temperatures;
     }
+
+
 }

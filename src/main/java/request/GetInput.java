@@ -1,5 +1,6 @@
 package request;
 
+
 import java.util.Scanner;
 
 public class GetInput {
@@ -11,13 +12,13 @@ public class GetInput {
         this.cityName = getCityNameFromUser();
         this.requestType = getRequestTypeFromUser();
     }
-    private String getCityNameFromUser() {
-        Scanner scanner = new Scanner (System.in);
+    public String getCityNameFromUser() {
+        Scanner scanner = new Scanner(System.in);
         System.out.print("Enter city name ");
         return scanner.next();
     }
 
-    private String getRequestTypeFromUser() {
+    public String getRequestTypeFromUser() {
         Scanner scanner = new Scanner (System.in);
         System.out.print("Enter request type 'CurrentWeather' or 'Forecast' ");
         return scanner.next();
@@ -31,3 +32,4 @@ public class GetInput {
         return requestType;
     }
 }
+

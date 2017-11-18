@@ -11,24 +11,22 @@ public class WeatherRequest {
     private HttpURLConnection conCurrentWeather;
     private HttpURLConnection conForecast;
 
-    public WeatherRequest(String cityName, String requestType) throws IOException {
+    public WeatherRequest(String cityName, String requestType) {
         this.cityName = cityName;
         this.requestType = requestType;
+    }
 
+    public void setConnection() throws IOException {
         if (requestType.equals("CurrentWeather")) {
             URL url = new URL("http://api.openweathermap.org/data/2.5/weather?q=" + cityName + "&APPID=fd09937b45795f44839aebdf691308d3");
             this.conCurrentWeather = (HttpURLConnection) url.openConnection();
-        }
-        if (requestType.equals("Forecast")) {
+        } else if (requestType.equals("Forecast")) {
             URL url = new URL("http://api.openweathermap.org/data/2.5/forecast?q=" + cityName + "&appid=3e50ca25365591599eb5a10eafa5c7d9");
             this.conForecast = (HttpURLConnection) url.openConnection();
-        }
-
-        if (requestType.equals("CurrentWeather") || requestType.equals("Forecast")) {
-            throw new IllegalArgumentException("Request type wrong!");
+        } else {
+            throw new IllegalArgumentException("Wrong request type!");
         }
     }
-
     public String getCityName() {
         return cityName;
     }
