@@ -9,7 +9,12 @@ import java.util.List;
 public class Reader {
 
 
-    private static final int LENGHTH_OF_FIXED_STRING = 8;
+    private static final int LENGTH_OF_FIXED_STRING_7 = 7;
+    private static final int LENGTH_OF_FIXED_STRING_8 = 8;
+    private static final int LENGTH_OF_FIXED_STRING_14 = 14;
+    private static final int LENGTH_OF_FIXED_STRING_18 = 18;
+    private static final int NR_OF_TEMPERATURES_IN_3_DAYS = 24;
+
 
     public Reader() {}
 
@@ -38,21 +43,33 @@ public class Reader {
         return String.valueOf(report);
     }
 
+    public String readCoordinatesFrom(String report, String requestType) {
+        int index = report.indexOf("\"coord\":{");
+        if (requestType.equals("CurrentWeather")) {
+            int lastIndex = report.indexOf(",\"weather\"");
+            return report.substring(index + LENGTH_OF_FIXED_STRING_8, lastIndex);
+        } else {
+            int lastIndex = report.indexOf(",\"country\"");
+            return report.substring(index + LENGTH_OF_FIXED_STRING_8, lastIndex);
+        }
+
+    }
+
     public String readNameFrom(String report, String requestType) {
         int index = report.indexOf("\"name\":\"");
         if (requestType.equals("CurrentWeather")) {
             int lastIndex = report.indexOf("\",\"cod\"");
-            return report.substring(index + LENGHTH_OF_FIXED_STRING, lastIndex);
+            return report.substring(index + LENGTH_OF_FIXED_STRING_8, lastIndex);
         } else {
             int lastIndex = report.indexOf("\",\"coord\"");
-            return report.substring(index + LENGHTH_OF_FIXED_STRING, lastIndex);
+            return report.substring(index + LENGTH_OF_FIXED_STRING_8, lastIndex);
         }
     }
 
     public String readCurrentTemperatureFrom(String report) {
         int index = report.indexOf("\"temp\":");
         String finalTemp = "";
-        String temp = report.substring(index + 7, index + 14);
+        String temp = report.substring(index + LENGTH_OF_FIXED_STRING_7, index + LENGTH_OF_FIXED_STRING_14);
         for (int i = 0; i < temp.length(); i++) {
             if (i == 3) {
                 finalTemp += ".";
@@ -72,7 +89,7 @@ public class Reader {
         int index = report.indexOf(match);
         while (index >= 0) {
             index = report.indexOf(match, index + 1);
-            String temp = report.substring(index + 7, index + 14);
+            String temp = report.substring(index + match.length(), index + LENGTH_OF_FIXED_STRING_18);
 
             for (int i = 0; i < temp.length(); i++) {
                 if (i == 3) {
@@ -84,7 +101,7 @@ public class Reader {
             }
             temperatures.add(finalTemp);
             finalTemp = "";
-            if (temperatures.size() == 24) {
+            if (temperatures.size() == NR_OF_TEMPERATURES_IN_3_DAYS) {
                 return temperatures;
             }
         }
@@ -99,8 +116,7 @@ public class Reader {
         int index = report.indexOf(match);
         while (index >= 0) {
             index = report.indexOf(match, index + 1);
-            String temp = report.substring(index + 7, index + 14);
-
+            String temp = report.substring(index + match.length(), index + LENGTH_OF_FIXED_STRING_18);
             for (int i = 0; i < temp.length(); i++) {
                 if (i == 3) {
                     finalTemp += ".";
@@ -111,12 +127,34 @@ public class Reader {
             }
             temperatures.add(finalTemp);
             finalTemp = "";
-            if (temperatures.size() == 24) {
+            if (temperatures.size() == NR_OF_TEMPERATURES_IN_3_DAYS) {
                 return temperatures;
             }
         }
         return temperatures;
     }
 
+    public String readOutputSample() throws IOException {
+        File file = new File("C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\samples\\sampleOutput.txt");
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String inputLine;
+        StringBuilder sample = new StringBuilder();
+        while ((inputLine = br.readLine()) != null) {
+            sample.append(inputLine);
+        }
+        br.close();
+        return String.valueOf(sample);
+    }
 
+    public String readFullReportSample() throws IOException {
+        File file = new File("C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\samples\\fullReportSample.txt");
+        BufferedReader br = new BufferedReader(new FileReader(file));
+        String inputLine;
+        StringBuilder sample = new StringBuilder();
+        while ((inputLine = br.readLine()) != null) {
+            sample.append(inputLine);
+        }
+        br.close();
+        return String.valueOf(sample);
+    }
 }

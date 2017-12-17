@@ -1,16 +1,16 @@
 package tests;
 
+import builder.RepositoryBuilder;
 import calculator.Calculator;
 import org.junit.Before;
 import org.junit.Test;
 import reader.Reader;
-import repository.WeatherRepository;
-import request.WeatherRequest;
+import repository.Repository;
 import validator.Validator;
 import writer.Writer;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,11 +25,8 @@ public class ApiTests {
     private Validator validator;
     private Writer writer;
     private Calculator calculator;
-    private WeatherRepository weatherRepository;
-    private String requestTypeCurrentWeather;
-    private String requestTypeForecast;
-    private List<HttpURLConnection> currentWeatherConnections = new ArrayList<>();
-    private List<HttpURLConnection> forecastConnections = new ArrayList<>();
+    private List<Repository> weatherRepositories = new ArrayList<>();
+    private List<Repository> forecastRepositories = new ArrayList<>();
 
 
     @Before
@@ -44,173 +41,158 @@ public class ApiTests {
         this.writer = new Writer();
         this.validator = new Validator();
         this.calculator = new Calculator();
-        //this.weatherRepository = new WeatherRepository();
+        RepositoryBuilder repositoryBuilder = new RepositoryBuilder(reader);
 
-        this.requestTypeCurrentWeather = "CurrentWeather";
-        this.requestTypeForecast = "Forecast";
-
-        makeListOfConnectionsToMakeRequestsToAPI();
-
-    }
-
-    private void makeListOfConnectionsToMakeRequestsToAPI() throws IOException {
-        String cities = reader.readInputTxtFile();
-        String[] city = cities.split(", ");
-        for (int i = 0; i < city.length; i++) {
-            WeatherRequest request = new WeatherRequest(city[i], requestTypeCurrentWeather);
-            WeatherRequest forecastRequest = new WeatherRequest(city[i], requestTypeForecast);
-
-            request.setConnection();
-            forecastRequest.setConnection();
-
-            HttpURLConnection currentWeatherConnection = request.getConCurrentWeather();
-            HttpURLConnection forecastConnection = forecastRequest.getConForecast();
-            currentWeatherConnections.add(currentWeatherConnection);
-            forecastConnections.add(forecastConnection);
-        }
+        this.weatherRepositories = repositoryBuilder.buildCurrentWeatherRepositories();
+        this.forecastRepositories = repositoryBuilder.buildForecastRepositories();
     }
 
 
     @Test
     public void testAllCurrentWeatherConnectionsSuccessfulToWeatherApi() throws IOException {
         int countTrue = 0;
-        for (int i = 0; i < currentWeatherConnections.size(); i++) {
-            if (currentWeatherConnections.get(i).getResponseCode() == 200) {
+        for (Repository repository : weatherRepositories) {
+            if (repository.currentWeatherConnection.getResponseCode() == 200) {
                 countTrue++;
             }
         }
-        assertEquals(currentWeatherConnections.size(), countTrue);
+        assertEquals(weatherRepositories.size(), countTrue);
     }
 
     @Test
     public void testAllForecastConnectionsSuccessfulToWeatherApi() throws IOException {
         int countTrue = 0;
-        for (int i = 0; i < forecastConnections.size(); i++) {
-            if (forecastConnections.get(i).getResponseCode() == 200) {
+        for (Repository forecastRepository : forecastRepositories) {
+            if (forecastRepository.forecastConnection.getResponseCode() == 200) {
                 countTrue++;
             }
         }
-        assertEquals(forecastConnections.size(), countTrue);
+        assertEquals(forecastRepositories.size(), countTrue);
     }
 
     @Test
     public void testGetCurrentTemperatureOfCity() throws IOException {
         int countTrue = 0;
-        for (int i = 0; i < currentWeatherConnections.size(); i++) {
-            String report = reader.readFrom(currentWeatherConnections.get(i));
-            String temperature = reader.readCurrentTemperatureFrom(report);
+        for (Repository repository : weatherRepositories) {
+            String temperature = reader.readCurrentTemperatureFrom(repository.fullWeatherReport);
             boolean actual = validator.validateTemperatureFormat(temperature);
             if (actual) {
                 countTrue++;
             }
         }
-        assertEquals(currentWeatherConnections.size(), countTrue);
+        assertEquals(weatherRepositories.size(), countTrue);
 
     }
 
     @Test
     public void testMaxTemperatureOf3DaysFromForecast() throws IOException {
-        int countTrue = 0;
-        for (int i = 0; i < forecastConnections.size(); i++) {
-            String report = reader.readFrom(forecastConnections.get(i));
-            List<String> temperatures = reader.readMaxTemperaturesFrom(report);
-            String maxTemperature = calculator.findMaxTemperatureFrom(temperatures);
-            boolean actual = validator.confirmMaxTemperature(maxTemperature, temperatures);
-            if (actual) {
-                countTrue++;
-            }
+        boolean actual = false;
+        for (Repository forecastRepository : forecastRepositories) {
+            List<String> temperatures = reader.readMaxTemperaturesFrom(forecastRepository.fullForecastReport);
+            List<Double> maxTemperatures = calculator.findMaxTemperaturesFrom(temperatures);
+            actual = validator.confirmMaxTemperatures(maxTemperatures, temperatures);
         }
-        assertEquals(forecastConnections.size(), countTrue);
+        assertEquals(true, actual);
     }
 
     @Test
     public void testMinTemperatureOf3DaysFromForecast() throws IOException {
-        int countTrue = 0;
-        for (int i = 0; i < forecastConnections.size(); i++) {
-            String report = reader.readFrom(forecastConnections.get(i));
-            List<String> temperatures = reader.readMinTemperaturesFrom(report);
-            String minTemperature = calculator.findMinTemperatureFrom(temperatures);
-            boolean actual = validator.confirmMinTemperature(minTemperature, temperatures);
-            if (actual) {
-                countTrue++;
-            }
+        boolean actual = false;
+        for (Repository forecastRepository : forecastRepositories) {
+            List<String> temperatures = reader.readMinTemperaturesFrom(forecastRepository.fullForecastReport);
+            List<Double> minTemperatures = calculator.findMinTemperaturesFrom(temperatures);
+            actual = validator.confirmMinTemperatures(minTemperatures, temperatures);
         }
-        assertEquals(forecastConnections.size(), countTrue);
+        assertEquals(true, actual);
     }
 
     @Test
     public void testCurrentWeatherReportContainsLonAndLat() throws IOException {
         int countTrue = 0;
-        for (int i = 0; i < currentWeatherConnections.size(); i++) {
-            String report = reader.readFrom(currentWeatherConnections.get(i));
-            boolean actual = validator.validateCoordinatesExist(report);
+        for (Repository repository : weatherRepositories) {
+            boolean actual = validator.validateCoordinatesExist(repository.fullWeatherReport);
             if (actual) {
                 countTrue++;
             }
         }
-        assertEquals(currentWeatherConnections.size(), countTrue);
+        assertEquals(weatherRepositories.size(), countTrue);
     }
 
     @Test
-    public void testForcecastReportContainsLonAndLat() throws IOException {
+    public void testForecastReportContainsLonAndLat() throws IOException {
         int countTrue = 0;
-        for (int i = 0; i < forecastConnections.size(); i++) {
-            String report = reader.readFrom(forecastConnections.get(i));
-            boolean actual = validator.validateCoordinatesExist(report);
+        for (Repository forecastRepository : forecastRepositories) {
+            boolean actual = validator.validateCoordinatesExist(forecastRepository.fullForecastReport);
             if (actual) {
                 countTrue++;
             }
         }
-        assertEquals(forecastConnections.size(), countTrue);
+        assertEquals(forecastRepositories.size(), countTrue);
     }
 
     @Test
     public void testCurrentWeatherReportMayBeJsonFormat() throws IOException {
         int countTrue = 0;
-        for (int i = 0; i < currentWeatherConnections.size(); i++) {
-            String report = reader.readFrom(currentWeatherConnections.get(i));
-            boolean actual = validator.validateFormat(report);
+        for (Repository repository : weatherRepositories) {
+            boolean actual = validator.validateJsonFormat(repository.fullWeatherReport);
             if (actual) {
                 countTrue++;
             }
         }
-        assertEquals(currentWeatherConnections.size(), countTrue);
+        assertEquals(weatherRepositories.size(), countTrue);
     }
 
     @Test
     public void testForecastReportMayBeJsonFormat() throws IOException {
         int countTrue = 0;
-        for (int i = 0; i < forecastConnections.size(); i++) {
-            String report = reader.readFrom(forecastConnections.get(i));
-            boolean actual = validator.validateFormat(report);
+        for (Repository forecastRepository : forecastRepositories) {
+            boolean actual = validator.validateJsonFormat(forecastRepository.fullForecastReport);
             if (actual) {
                 countTrue++;
             }
         }
-        assertEquals(currentWeatherConnections.size(), countTrue);
+        assertEquals(forecastRepositories.size(), countTrue);
     }
-
-    @Test
-    public void testWriteReportsToOutputFile() throws IOException {
-        for (int i = 0; i < currentWeatherConnections.size(); i++) {
-            writer.writeToFileBETTER();
-            writer.writeToFile(reader, currentWeatherConnections.get(i), requestTypeCurrentWeather);
-            writer.writeToFile(reader, forecastConnections.get(i), requestTypeForecast);
-        }
-
-    }
-
 
     @Test
     public void testWriterWriteToFileMethodCalledCorrectNumberOfTimes() throws IOException {
         Writer writer = mock(Writer.class);
 
-        for (int i = 0; i < currentWeatherConnections.size(); i++) {
-            writer.writeToFile(reader, currentWeatherConnections.get(i), requestTypeCurrentWeather);
-            writer.writeToFile(reader, forecastConnections.get(i), requestTypeForecast);
+        for (Repository repository : weatherRepositories) {
+            writer.writeReportToFile(repository);
         }
-        verify(writer, times(6)).writeToFile(any(), any(), anyString());
+        for (Repository forecastRepository : forecastRepositories) {
+            writer.writeReportToFile(forecastRepository);
+        }
+        int times = weatherRepositories.size() + forecastRepositories.size();
+        verify(writer, times(times)).writeReportToFile(any());
     }
+
+    @Test
+    public void testCorrectNumberOfFilesWrittenInOutputFolder() throws IOException {
+        int count = 0;
+        File folder = new File("C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output");
+        writer.cleanDirectory(folder);
+        writer.writeReportsToOutputFile(weatherRepositories, forecastRepositories);
+        if (folder.exists()) {
+            count = folder.listFiles().length;
+        } else {
+            throw new IOException("Folder doesn't exist");
+        }
+        assertEquals(weatherRepositories.size(), count);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 

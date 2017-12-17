@@ -1,0 +1,18 @@
+{
+    "city":{
+        "name":"Tallinn",
+        "coord":{
+            "lat":59.4372,
+            "lon":24.7454
+        },
+        "temperatures":{
+            "temp_now":274.51,
+            "temp_min_today":271.64,
+            "temp_min_tomorrow":268.043,
+            "temp_min_after_tomorrow":269.213,
+            "temp_max_today":274.694,
+            "temp_max_after_tomorrow":273.999,
+            "temp_max_after_tomorrow":274.937
+        }
+    }
+}

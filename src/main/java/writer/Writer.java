@@ -1,53 +1,56 @@
 package writer;
 
-import reader.Reader;
+import repository.Repository;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.HttpURLConnection;
+import java.util.List;
 
 public class Writer {
 
     public Writer() {}
 
-    public void writeToFile(Reader reader, HttpURLConnection con, String requestType) throws IOException {
-        String report = reader.readFrom(con);
-        String cityName = reader.readNameFrom(report, requestType);
+    public void writeReportToFile (Repository repository) throws IOException {
+        String path = "C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output\\" + repository.cityName + ".txt";
+        File file = new File(path);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+        writer.write(repository.report);
+        writer.close();
+    }
 
-        if (requestType.equals("CurrentWeather")) {
-            String path = "C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output\\" + cityName + "Current.txt";
-            File file = new File(path);
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(report);
-            writer.close();
+    public void writeReportsToOutputFile(List<Repository> weatherRepositories, List<Repository> forecastRepositories) throws IOException {
+        for (Repository repository : weatherRepositories) {
+            this.writeReportToFile(repository);
         }
-
-        if (requestType.equals("Forecast")) {
-            String path = "C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output\\" + cityName + "Forecast.txt";
-            File file = new File(path);
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(report);
-            writer.close();
+        for (Repository forecastRepository : forecastRepositories) {
+            this.writeReportToFile(forecastRepository);
         }
     }
 
-    public void writeToFileBETTER(String report, String cityName, String requestType) throws IOException {
-        if (requestType.equals("CurrentWeather")) {
-            String path = "C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output\\" + cityName + "Current.txt";
-            File file = new File(path);
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(report);
-            writer.close();
+    private static void removeDirectory(File dir) {
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null && files.length > 0) {
+                for (File aFile : files) {
+                    removeDirectory(aFile);
+                }
+            }
+            dir.delete();
+        } else {
+            dir.delete();
         }
+    }
 
-        if (requestType.equals("Forecast")) {
-            String path = "C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output\\" + cityName + "Forecast.txt";
-            File file = new File(path);
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.write(report);
-            writer.close();
+    public void cleanDirectory(File dir) {
+        if (dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null && files.length > 0) {
+                for (File aFile : files) {
+                    removeDirectory(aFile);
+                }
+            }
         }
     }
 }
