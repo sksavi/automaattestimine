@@ -101,7 +101,7 @@ public class RepositoryBuilder {
                     "            " + coord[0] + ",\n" +
                     "            " + coord[1] + "\n" +
                     "        },\n" +
-                    "       \"temp_now\":" + repository.currentTemperature + ",\n" +
+                    "       \"temp_now\":" + repository.currentTemperature + "\n" +
                     "        }\n" +
                     "    }\n" +
                     "}";

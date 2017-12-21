@@ -5,22 +5,25 @@ import repository.Repository;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 public class Writer {
 
     public Writer() {}
 
-    public void writeReportToFile (Repository repository) throws IOException {
-        String path = "C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output\\" + repository.cityName + ".txt";
-        File file = new File(path);
-        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-        writer.write(repository.report);
-        writer.close();
+    public void writeReportToFile (Repository repository) throws Exception {
+        if (repository.getCityName() != null) {
+            String path = "C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output\\" + repository.getCityName() + ".txt";
+            File file = new File(path);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.write(repository.getReport());
+            writer.close();
+        } else {
+            throw new Exception("No city name found!");
+        }
     }
 
-    public void writeReportsToOutputFile(List<Repository> weatherRepositories, List<Repository> forecastRepositories) throws IOException {
+    public void writeReportsToOutputFile(List<Repository> weatherRepositories, List<Repository> forecastRepositories) throws Exception {
         for (Repository repository : weatherRepositories) {
             this.writeReportToFile(repository);
         }
@@ -29,7 +32,7 @@ public class Writer {
         }
     }
 
-    private static void removeDirectory(File dir) {
+    private void removeDirectory(File dir) {
         if (dir.isDirectory()) {
             File[] files = dir.listFiles();
             if (files != null && files.length > 0) {

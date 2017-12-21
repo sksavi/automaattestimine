@@ -6,13 +6,13 @@
             "lon":24.7454
         },
         "temperatures":{
-            "temp_now":274.51,
-            "temp_min_today":271.64,
-            "temp_min_tomorrow":268.043,
-            "temp_min_after_tomorrow":269.213,
-            "temp_max_today":274.694,
-            "temp_max_after_tomorrow":273.999,
-            "temp_max_after_tomorrow":274.937
+            "temp_now":274.11,
+            "temp_min_today":270.933,
+            "temp_min_tomorrow":270.918,
+            "temp_min_after_tomorrow":275.546,
+            "temp_max_today":275.902,
+            "temp_max_after_tomorrow":275.794,
+            "temp_max_after_tomorrow":276.699
         }
     }
 }

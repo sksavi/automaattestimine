@@ -1,11 +1,14 @@
 package tests;
 
+import builder.RepositoryBuilder;
 import calculator.Calculator;
 import org.junit.Test;
 import reader.Reader;
 import repository.Repository;
+import writer.Writer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -39,7 +42,6 @@ public class MockTest {
 
         String coords = repository.getCoordinates();
 
-
         coords = coords.substring(1, coords.length() - 1);
         String[] coord = coords.split(",");
 
@@ -60,11 +62,47 @@ public class MockTest {
                         "            \"temp_min_after_tomorrow\":" + repository.get_3minTemperatures().get(2) + "," +
                         "            \"temp_max_today\":" + repository.get_3maxTemperatures().get(0) + "," +
                         "            \"temp_max_after_tomorrow\":" + repository.get_3maxTemperatures().get(1) + "," +
-                        "            \"temp_max_after_tomorrow\":" + repository.get_3maxTemperatures().get(2) + "" +
+                        "            \"temp_max_after_tomorrow\":" + repository.get_3maxTemperatures().get(2) +
                         "        }" +
                         "    }" +
                         "}";
 
         assertEquals(expectedReport, actualReport);
     }
+
+    @Test
+    public void testIfWriterWritesFileWithCorrectName() throws Exception {
+        Repository repository = mock(Repository.class);
+        Writer writer = new Writer();
+        Reader reader = new Reader();
+
+        when(repository.getCityName()).thenReturn("MockedCity");
+        when(repository.getReport()).thenReturn("This file is for testing");
+        writer.writeReportToFile(repository);
+        boolean actual = reader.findMatchInFolder(repository);
+
+        assertEquals(true, actual);
+    }
+
+
+    @Test
+    public void testMockedReaderDoSomething() throws Exception {
+        Reader reader = mock(Reader.class);
+
+        when(reader.readInputTxtFile()).thenReturn("Linn1, Linn2");
+
+        RepositoryBuilder repositoryBuilder = new RepositoryBuilder(reader);
+
+        Repository linn1 = new Repository("Linn1");
+        Repository linn2 = new Repository("Linn2");
+
+        List<Repository> repositories = new ArrayList<>();
+        repositories.add(linn1);
+        repositories.add(linn2);
+
+        when(repositoryBuilder.buildCurrentWeatherRepositories()).thenReturn(repositories);
+
+        //......
+    }
+
 }

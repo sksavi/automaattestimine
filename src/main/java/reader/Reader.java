@@ -1,5 +1,7 @@
 package reader;
 
+import repository.Repository;
+
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
@@ -156,5 +158,21 @@ public class Reader {
         }
         br.close();
         return String.valueOf(sample);
+    }
+
+    public boolean findMatchInFolder(Repository repository) throws Exception {
+        File folder = new File("C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output");
+        File[] listOfFiles = folder.listFiles();
+
+        if (listOfFiles != null) {
+            for (File file : listOfFiles) {
+                if (file.getName().equals(repository.getCityName() + ".txt")) {
+                    return true;
+                }
+            }
+            return false;
+        } else {
+            throw new Exception("Folder is empty!");
+        }
     }
 }

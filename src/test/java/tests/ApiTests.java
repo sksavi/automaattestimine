@@ -31,11 +31,8 @@ public class ApiTests {
 
     @Before
     public void setup() throws Exception {
-        //String cityName = GetInput();
-        //String requestType = GetInput.getRequestTypeFromUser();
         //GetInput input = new GetInput();
         //String cityName = input.getCityName();
-        //String requestType = input.getRequestType();
 
         this.reader = new Reader();
         this.writer = new Writer();
@@ -85,7 +82,7 @@ public class ApiTests {
     }
 
     @Test
-    public void testMaxTemperatureOf3DaysFromForecast() throws IOException {
+    public void testMaxTemperatureOfEachDayFor3DaysFromForecast() throws IOException {
         boolean actual = false;
         for (Repository forecastRepository : forecastRepositories) {
             List<String> temperatures = reader.readMaxTemperaturesFrom(forecastRepository.fullForecastReport);
@@ -96,7 +93,7 @@ public class ApiTests {
     }
 
     @Test
-    public void testMinTemperatureOf3DaysFromForecast() throws IOException {
+    public void testMinTemperatureOfEachDayFor3DaysFromForecast() throws IOException {
         boolean actual = false;
         for (Repository forecastRepository : forecastRepositories) {
             List<String> temperatures = reader.readMinTemperaturesFrom(forecastRepository.fullForecastReport);
@@ -155,7 +152,7 @@ public class ApiTests {
     }
 
     @Test
-    public void testWriterWriteToFileMethodCalledCorrectNumberOfTimes() throws IOException {
+    public void testWriterWriteToFileMethodCalledCorrectNumberOfTimes() throws Exception {
         Writer writer = mock(Writer.class);
 
         for (Repository repository : weatherRepositories) {
@@ -165,11 +162,18 @@ public class ApiTests {
             writer.writeReportToFile(forecastRepository);
         }
         int times = weatherRepositories.size() + forecastRepositories.size();
-        verify(writer, times(times)).writeReportToFile(any());
+
+        //MyClassToTest smth = new MyClassToTest();
+        //smth.doSomethingWithWriter(writer)
+
+        verify(writer, times(3)).writeReportToFile(any());
+
+        //when(writer.makeSOmthng()).thenReturn(3);
+
     }
 
     @Test
-    public void testCorrectNumberOfFilesWrittenInOutputFolder() throws IOException {
+    public void testCorrectNumberOfFilesWrittenInOutputFolder() throws Exception {
         int count = 0;
         File folder = new File("C:\\Users\\hp\\sksaviAuto\\src\\main\\java\\output");
         writer.cleanDirectory(folder);
@@ -181,18 +185,6 @@ public class ApiTests {
         }
         assertEquals(weatherRepositories.size(), count);
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 
